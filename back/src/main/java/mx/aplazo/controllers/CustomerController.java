@@ -1,6 +1,9 @@
 package mx.aplazo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -43,9 +47,20 @@ public class CustomerController {
 
   @GetMapping("/customer/{id}")
   @Operation(summary = "Get customer identified by customerId")
-  public Customer findById(@PathVariable UUID id) {
-    return customersService
-        .findOne(id)
-        .orElseThrow(() -> new RuntimeException("Customer not found"));
+  public ResponseEntity<CustomerResponse> findById(
+      @Parameter(
+              in = ParameterIn.PATH,
+              description = "Customer's unique identified",
+              required = true)
+          @PathVariable
+          UUID id) {
+    Optional<Customer> retrievedCustomer = customersService.findOne(id);
+    return retrievedCustomer
+        .map(
+            customer ->
+                new ResponseEntity<>(
+                    CustomerResponse.builder().id(customer.getId()).build(),
+                    HttpStatusCode.valueOf(200)))
+        .orElse(new ResponseEntity<>(HttpStatusCode.valueOf(404)));
   }
 }
