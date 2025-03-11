@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "Customers", description = "Manage customers")
@@ -32,7 +34,7 @@ public class CustomerController {
 
   @GetMapping("/customer/{id}")
   @Operation(summary = "Get customer identified by customerId")
-  public Customer findById(@PathVariable Long id) {
+  public Customer findById(@PathVariable UUID id) {
     return customersService
         .findOne(id)
         .orElseThrow(() -> new RuntimeException("Customer not found"));

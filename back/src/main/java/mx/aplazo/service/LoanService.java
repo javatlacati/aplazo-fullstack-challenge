@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -70,12 +71,12 @@ public class LoanService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<Loan> findOne(Long id) {
+  public Optional<Loan> findOne(UUID id) {
     LOG.debug("Request to get Loan : {}", id);
     return loanRepository.findById(id);
   }
 
-  public void delete(Long id) {
+  public void delete(UUID id) {
     LOG.debug("Request to delete Loan : {}", id);
     loanRepository.deleteById(id);
   }

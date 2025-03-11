@@ -1,6 +1,8 @@
 package mx.aplazo.service;
 
 import java.util.Optional;
+import java.util.UUID;
+
 import mx.aplazo.model.Customer;
 import mx.aplazo.repository.CustomerRepository;
 import org.slf4j.Logger;
@@ -61,12 +63,12 @@ public class CustomerService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<Customer> findOne(Long id) {
+  public Optional<Customer> findOne(UUID id) {
     LOG.debug("Request to get Customer : {}", id);
     return customerRepository.findById(id);
   }
 
-  public void delete(Long id) {
+  public void delete(UUID id) {
     LOG.debug("Request to delete Customer : {}", id);
     customerRepository.deleteById(id);
   }
