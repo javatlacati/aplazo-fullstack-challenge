@@ -3,6 +3,8 @@ package mx.aplazo.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +16,7 @@ import mx.aplazo.model.Customer;
 import mx.aplazo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +40,25 @@ public class CustomerController {
         @ApiResponse(responseCode = "201", description = "Created"),
       })
   public ResponseEntity<CustomerResponse> createCustomer(
-      @RequestBody(description = "Customer request") CustomerRequest body) {
+      @RequestBody(
+              description = "Customer request",
+              content =
+                  @Content(
+                      schema = @Schema,
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      examples = {
+                        @ExampleObject(
+                            name = "Customer under 18",
+                            description = "Under age customer",
+                            value =
+                                "{\"firstName\": \"Juan\", \"lastName\": \"López\", \"secondLastName\": \"Pérez\",\"dateOfBirth\": \"2009-11-02\"}"),
+                        @ExampleObject(
+                            name = "Customer accepted",
+                            description = "Customer which age is in accepted range",
+                            value =
+                                "{\"firstName\": \"Pepe\",  \"lastName\": \"García\",  \"secondLastName\": \"Flores\",  \"dateOfBirth\": \"1998-07-21\"}")
+                      }))
+          CustomerRequest body) {
     Customer customer = new Customer();
     customer.setName(body.getFirstName()); // TODO review logic here
     Customer savedCustomer = customersService.save(customer);
