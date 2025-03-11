@@ -1,0 +1,15 @@
+${AnsiColor.GREEN}   ______             __                                ${AnsiColor.BLUE}      _______   __    __  _______   __
+${AnsiColor.GREEN}  /      \           |  \                               ${AnsiColor.BLUE}     |       \ |  \  |  \|       \ |  \
+${AnsiColor.GREEN} |  $$$$$$\  ______  | $$  ______   ________   ______   ${AnsiColor.BLUE}     | $$$$$$$\| $$\ | $$| $$$$$$$\| $$
+${AnsiColor.GREEN} | $$__| $$ /      \ | $$ |      \ |        \ /      \  ${AnsiColor.BLUE}     | $$__/ $$| $$$\| $$| $$__/ $$| $$
+${AnsiColor.GREEN} | $$    $$|  $$$$$$\| $$  \$$$$$$\ \$$$$$$$$|  $$$$$$\ ${AnsiColor.BLUE}     | $$    $$| $$$$\ $$| $$    $$| $$
+${AnsiColor.GREEN} | $$$$$$$$| $$  | $$| $$ /      $$  /    $$ | $$  | $$ ${AnsiColor.BLUE}     | $$$$$$$\| $$\$$ $$| $$$$$$$ | $$
+${AnsiColor.GREEN} | $$  | $$| $$__/ $$| $$|  $$$$$$$ /  $$$$_ | $$__/ $$ ${AnsiColor.BLUE}     | $$__/ $$| $$ \$$$$| $$      | $$_____
+${AnsiColor.GREEN} | $$  | $$| $$    $$| $$ \$$    $$|  $$    \ \$$    $$ ${AnsiColor.BLUE}     | $$    $$| $$  \$$$| $$      | $$     \
+${AnsiColor.GREEN}  \$$   \$$| $$$$$$$  \$$  \$$$$$$$ \$$$$$$$$  \$$$$$$  ${AnsiColor.BLUE}      \$$$$$$$  \$$   \$$ \$$       \$$$$$$$$
+${AnsiColor.GREEN}           | $$$
+${AnsiColor.GREEN}           | $$$
+${AnsiColor.GREEN}            \$$$
+
+${AnsiColor.BRIGHT_BLUE}:: Aplazo BNPL API :: Running Spring Boot ${spring-boot.version} :: Startup profile(s) ${spring.profiles.active} ::
+:: https://aplazo.mx/ ::${AnsiColor.DEFAULT}
