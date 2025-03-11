@@ -1,9 +1,23 @@
 <aplz-ui-logo size="lg"></aplz-ui-logo>
 
 <form [formGroup]="form" (ngSubmit)="register()">
+  <div>
+    <div class="text-center">
+      <h2 class="text-2xl font-bold m-4">Información personal</h2>
+      <p class="text-lg font-thin text-dark-secondary">
+        Ayúdanos a completar tu información personal para verificar tu cuenta
+      </p>
+    </div>
+  </div>
+
+  <!-- if form is invalid show error -->
+  <div class="text-sm text-alert-warning-icon" *ngIf="form.invalid">
+    <p>{{errorMessage}}</p>
+  </div>
+
   <div class="grid gap-6 mb-6 md:grid-cols-2">
     <div>
-      <label for="username" class="block mb-2 text-sm font-medium text-dark">
+      <label for="firstname" class="block mb-2 text-sm font-medium text-dark">
         Nombre(s)
       </label>
       <input
@@ -55,6 +69,17 @@
         placeholder="Fecha de nacimiento"
         formControlName="dateOfBirth"
       />
+    </div>
+
+    <div>
+      <label for="sex" class="block mb-2 text-sm font-medium text-dark">
+        Sexo
+      </label>
+
+      <select id="sex">
+        <option>M</option>
+        <option>F</option>
+      </select>
     </div>
   </div>
   <button
