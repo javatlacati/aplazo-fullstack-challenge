@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import mx.aplazo.domain.CustomerRequest;
 import mx.aplazo.model.Customer;
 import mx.aplazo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,9 @@ public class CustomerController {
       value = {
         @ApiResponse(responseCode = "201", description = "Created"),
       })
-  public Customer createCustomer(@RequestBody(description = "Customer request") Customer customer) {
+  public Customer createCustomer(@RequestBody(description = "Customer request") CustomerRequest body) {
+    Customer customer = new Customer();
+    customer.setName(body.getFirstName()); //TODO review logic here
     return customersService.save(customer);
   }
 
