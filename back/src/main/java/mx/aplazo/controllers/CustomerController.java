@@ -6,9 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mx.aplazo.domain.CustomerRequest;
+import mx.aplazo.domain.CustomerResponse;
 import mx.aplazo.model.Customer;
 import mx.aplazo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +32,13 @@ public class CustomerController {
       value = {
         @ApiResponse(responseCode = "201", description = "Created"),
       })
-  public Customer createCustomer(@RequestBody(description = "Customer request") CustomerRequest body) {
+  public ResponseEntity<CustomerResponse> createCustomer(
+      @RequestBody(description = "Customer request") CustomerRequest body) {
     Customer customer = new Customer();
-    customer.setName(body.getFirstName()); //TODO review logic here
-    return customersService.save(customer);
+    customer.setName(body.getFirstName()); // TODO review logic here
+    Customer savedCustomer = customersService.save(customer);
+    return new ResponseEntity<>(
+        CustomerResponse.builder().id(savedCustomer.getId()).build(), HttpStatusCode.valueOf(200));
   }
 
   @GetMapping("/customer/{id}")
