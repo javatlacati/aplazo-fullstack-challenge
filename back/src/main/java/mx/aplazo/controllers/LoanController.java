@@ -15,6 +15,7 @@ import mx.aplazo.model.Loan;
 import mx.aplazo.service.CustomerService;
 import mx.aplazo.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,9 @@ import java.util.stream.Collectors;
 @Tag(name = "Loans", description = "Manage loans")
 @Log
 public class LoanController {
+  @Value("${loan.comissionAmount:0.1}")
+  double commissionAmount;
+
   @Autowired private LoanService loanService;
   @Autowired private CustomerService customerService;
 
@@ -57,7 +61,7 @@ public class LoanController {
               Loan createdLoan = loanService.save(loan);
               LoanResponsePaymentPlan loanResponsePaymentPlan =
                   LoanResponsePaymentPlan.builder()
-                      .commissionAmount(0.1d)
+                      .commissionAmount(commissionAmount)
                       .installments(
                           createdLoan.getInstallments().stream()
                               .map(
@@ -97,7 +101,7 @@ public class LoanController {
             loan -> {
               LoanResponsePaymentPlan paymentPlan =
                   LoanResponsePaymentPlan.builder()
-                      .commissionAmount(0.2d)
+                      .commissionAmount(commissionAmount)
                       .installments(
                           loan.getInstallments().stream()
                               .map(

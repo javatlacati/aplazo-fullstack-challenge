@@ -16,6 +16,7 @@ import mx.aplazo.domain.CustomerResponse;
 import mx.aplazo.model.Customer;
 import mx.aplazo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,12 @@ import java.util.UUID;
 @Tag(name = "Customers", description = "Manage customers")
 @Log
 public class CustomerController {
+  @Value("${customer.defaultCreditLineAmount:0}")
+  double creditLineAmount;
+
+  @Value("${customer.defaultAvailableCreditLineAmount:12000.5}")
+  double availableCreditLineAmount;
+
   @Autowired private CustomerService customersService;
 
   @PostMapping("/customers")
@@ -71,8 +78,8 @@ public class CustomerController {
             .secondLastName(body.getSecondLastName())
             .dateOfBirth(
                 Date.from(body.getDateOfBirth().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-            .creditLineAmount(0.0d)
-            .availableCreditLineAmount(0.0d)
+            .creditLineAmount(creditLineAmount)
+            .availableCreditLineAmount(availableCreditLineAmount)
             .build();
     log.fine("Creating customer: " + customer);
     Customer savedCustomer = customersService.save(customer);
