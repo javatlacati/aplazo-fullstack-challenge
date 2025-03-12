@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.java.Log;
 import mx.aplazo.domain.InstallmentResponse;
 import mx.aplazo.domain.LoanRequest;
 import mx.aplazo.domain.LoanResponse;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "Loans", description = "Manage loans")
+@Log
 public class LoanController {
   @Autowired private LoanService loanService;
   @Autowired private CustomerService customerService;
@@ -41,7 +43,7 @@ public class LoanController {
   @Operation(summary = "Create a loan")
   public ResponseEntity<LoanResponse> createLoan(
       @RequestBody(description = "Loan request") LoanRequest loanData) {
-
+    log.fine("Creating loan for customer: " + loanData.getCustomerId());
     Optional<Customer> retrievedCustomer = customerService.findOne(loanData.getCustomerId());
     return retrievedCustomer
         .map(
@@ -87,14 +89,37 @@ public class LoanController {
       @Parameter(in = ParameterIn.PATH, description = "Loan's unique identifier", required = true)
           @PathVariable
           UUID id) {
+    log.fine("Retrieving loan with id: " + id);
     Optional<Loan> retrievedLoan = loanService.findOne(id);
 
     return retrievedLoan
         .map(
-            loan ->
-                new ResponseEntity<>(
-                    LoanResponse.builder().customerId(loan.getCustomer().getId()).build(),
-                    HttpStatusCode.valueOf(200)))
+            loan -> {
+              LoanResponsePaymentPlan paymentPlan =
+                  LoanResponsePaymentPlan.builder()
+                      .commissionAmount(0.2d)
+                      .installments(
+                          loan.getInstallments().stream()
+                              .map(
+                                  installment ->
+                                      InstallmentResponse.builder()
+                                          .amount(installment.getAmount())
+                                          .status(installment.getStatus())
+                                          .scheduledPaymentDate(
+                                              LocalDate.from(installment.getScheduledPaymentDate()))
+                                          .build())
+                              .collect(Collectors.toList()))
+                      .build();
+              return new ResponseEntity<>(
+                  LoanResponse.builder()
+                      .customerId(loan.getCustomer().getId())
+                      .status(loan.getStatus())
+                      .createdAt(ZonedDateTime.from(loan.getCreatedAt()))
+                      .id(loan.getId())
+                      .paymentPlan(paymentPlan)
+                      .build(),
+                  HttpStatusCode.valueOf(200));
+            })
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 }
