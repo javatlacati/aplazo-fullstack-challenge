@@ -55,7 +55,7 @@ public class AplazoExceptionHandler extends ResponseEntityExceptionHandler {
                 .build()));
   }
 
-  private ResponseEntity<Object> buildResponseEntity(AplazoException apiError) {
+  public static ResponseEntity<Object> buildResponseEntity(AplazoException apiError) {
     return new ResponseEntity<>(apiError.getErrorResponse(), apiError.getHttpStatus());
   }
 }

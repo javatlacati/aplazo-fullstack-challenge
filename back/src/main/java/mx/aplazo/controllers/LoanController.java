@@ -5,11 +5,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.java.Log;
+import mx.aplazo.domain.ErrorResponse;
 import mx.aplazo.domain.InstallmentResponse;
 import mx.aplazo.domain.LoanRequest;
 import mx.aplazo.domain.LoanResponse;
 import mx.aplazo.domain.LoanResponsePaymentPlan;
+import mx.aplazo.exceptions.AplazoException;
+import mx.aplazo.exceptions.AplazoExceptionHandler;
+import mx.aplazo.exceptions.LoanNotFoundException;
 import mx.aplazo.model.Customer;
 import mx.aplazo.model.Loan;
 import mx.aplazo.service.CustomerService;
@@ -19,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,7 +98,7 @@ public class LoanController {
   public ResponseEntity<LoanResponse> getLoanById(
       @Parameter(in = ParameterIn.PATH, description = "Loan's unique identifier", required = true)
           @PathVariable
-          UUID id) {
+          UUID id) throws LoanNotFoundException {
     log.fine("Retrieving loan with id: " + id);
     Optional<Loan> retrievedLoan = loanService.findOne(id);
 
@@ -124,6 +130,22 @@ public class LoanController {
                       .build(),
                   HttpStatusCode.valueOf(200));
             })
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new LoanNotFoundException("Loan not found"));
+  }
+
+  @ExceptionHandler(LoanNotFoundException.class)
+  public ResponseEntity<Object> handleLoanNotFound(
+      LoanNotFoundException ex, HttpServletRequest request) {
+
+    return AplazoExceptionHandler.buildResponseEntity(
+        new AplazoException(
+            HttpStatus.valueOf(404),
+            ErrorResponse.builder()
+                .code("APZ000008")
+                .error("LOAN_NOT_FOUND")
+                .message("Error detail")
+                .path(request.getRequestURI())
+                .timestamp(Instant.now().getEpochSecond())
+                .build()));
   }
 }
