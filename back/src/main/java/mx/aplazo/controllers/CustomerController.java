@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.java.Log;
 import mx.aplazo.domain.CustomerRequest;
 import mx.aplazo.domain.CustomerResponse;
 import mx.aplazo.model.Customer;
@@ -24,12 +25,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "Customers", description = "Manage customers")
+@Log
 public class CustomerController {
   @Autowired private CustomerService customersService;
 
@@ -59,8 +64,17 @@ public class CustomerController {
                                 "{\"firstName\": \"Pepe\",  \"lastName\": \"García\",  \"secondLastName\": \"Flores\",  \"dateOfBirth\": \"1998-07-21\"}")
                       }))
           CustomerRequest body) {
-    Customer customer = new Customer();
-    customer.setName(body.getFirstName()); // TODO review logic here
+    Customer customer =
+        Customer.builder()
+            .firstName(body.getFirstName())
+            .lastName(body.getLastName())
+            .secondLastName(body.getSecondLastName())
+            .dateOfBirth(
+                Date.from(body.getDateOfBirth().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+            .creditLineAmount(0.0d)
+            .availableCreditLineAmount(0.0d)
+            .build();
+    log.fine("Creating customer: " + customer);
     Customer savedCustomer = customersService.save(customer);
     return new ResponseEntity<>(
         CustomerResponse.builder().id(savedCustomer.getId()).build(), HttpStatusCode.valueOf(200));
@@ -75,12 +89,18 @@ public class CustomerController {
               required = true)
           @PathVariable
           UUID id) {
+    log.fine("Finding customer by id: " + id);
     Optional<Customer> retrievedCustomer = customersService.findOne(id);
     return retrievedCustomer
         .map(
             customer ->
                 new ResponseEntity<>(
-                    CustomerResponse.builder().id(customer.getId()).build(),
+                    CustomerResponse.builder()
+                        .id(customer.getId())
+                        .creditLineAmount(customer.getCreditLineAmount())
+                        .availableCreditLineAmount(customer.getAvailableCreditLineAmount())
+                        .createdAt(ZonedDateTime.from(customer.getCreatedAt()))
+                        .build(),
                     HttpStatusCode.valueOf(200)))
         .orElse(new ResponseEntity<>(HttpStatusCode.valueOf(404)));
   }

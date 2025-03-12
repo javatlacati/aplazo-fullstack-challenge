@@ -41,16 +41,24 @@ public class CustomerService {
         .findById(customer.getId())
         .map(
             existingCustomer -> {
-              if (customer.getName() != null) {
-                existingCustomer.setName(customer.getName());
+              if (customer.getFirstName() != null) {
+                existingCustomer.setFirstName(customer.getFirstName());
               }
-              if (customer.getEmail() != null) {
-                existingCustomer.setEmail(customer.getEmail());
+              if (customer.getLastName() != null) {
+                existingCustomer.setLastName(customer.getLastName());
               }
-              if (customer.getPhoneNumber() != null) {
-                existingCustomer.setPhoneNumber(customer.getPhoneNumber());
+              if (customer.getSecondLastName() != null) {
+                existingCustomer.setSecondLastName(customer.getSecondLastName());
               }
-
+              if (customer.getDateOfBirth() != null) {
+                existingCustomer.setDateOfBirth(customer.getDateOfBirth());
+              }
+              if (customer.getCreatedAt() != null) {
+                existingCustomer.setCreatedAt(customer.getCreatedAt());
+              }
+              existingCustomer.setCreditLineAmount(customer.getCreditLineAmount());
+              existingCustomer.setAvailableCreditLineAmount(
+                  customer.getAvailableCreditLineAmount());
               return existingCustomer;
             })
         .map(customerRepository::save);

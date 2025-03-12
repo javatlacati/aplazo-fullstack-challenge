@@ -1,21 +1,20 @@
 package mx.aplazo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
@@ -30,27 +29,35 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue private UUID id;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(nullable = false)
+    private String firstName;
 
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private String lastName;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @Column(nullable = false)
+    private String secondLastName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "customer" }, allowSetters = true)
-    private Set<Loan> loans = new HashSet<>();
+    @Column(nullable = false)
+    private Date dateOfBirth;
+
+    @Column(nullable = false)
+    private double creditLineAmount;
+
+    @Column(nullable = false)
+    private double availableCreditLineAmount;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMPTZ")
+    private Instant createdAt;
 
     @Override
     public boolean equals(Object o) {
