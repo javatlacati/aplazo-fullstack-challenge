@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { AplazoButtonComponent } from '@apz/shared-ui/button';
 import { AplazoLogoComponent } from '@apz/shared-ui/logo';
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {CustomerRequest} from "../../model/CustomerRequest";
 import {CustomerService} from "../../services/customer.service";
 
@@ -15,10 +15,11 @@ import {CustomerService} from "../../services/customer.service";
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.component.html',
-  imports: [ReactiveFormsModule, AplazoButtonComponent, AplazoLogoComponent, NgIf],
+  imports: [ReactiveFormsModule, AplazoButtonComponent, AplazoLogoComponent, NgIf, NgForOf],
 })
 export class RegisterComponent {
   errorMessage: string;
+  places = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Philadelphia'];
 
   constructor(
     private customersService: CustomerService,
