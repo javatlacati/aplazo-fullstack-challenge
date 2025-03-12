@@ -5,9 +5,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import mx.aplazo.domain.InstallmentResponse;
 import mx.aplazo.domain.LoanRequest;
 import mx.aplazo.domain.LoanResponse;
+import mx.aplazo.domain.LoanResponsePaymentPlan;
+import mx.aplazo.model.Customer;
 import mx.aplazo.model.Loan;
+import mx.aplazo.service.CustomerService;
 import mx.aplazo.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,26 +23,62 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "Loans", description = "Manage loans")
 public class LoanController {
   @Autowired private LoanService loanService;
+  @Autowired private CustomerService customerService;
 
   @PostMapping("/loans")
   @Operation(summary = "Create a loan")
   public ResponseEntity<LoanResponse> createLoan(
       @RequestBody(description = "Loan request") LoanRequest loanData) {
-    Loan loan = new Loan();
-    loan.setAmount(loanData.getAmount());
-    Loan createdLoan = loanService.save(loan);
-    // TODO implement
-    return new ResponseEntity<>(
-        LoanResponse.builder().customerId(loanData.getCustomerId()).build(),
-        HttpStatusCode.valueOf(201));
+
+    Optional<Customer> retrievedCustomer = customerService.findOne(loanData.getCustomerId());
+    return retrievedCustomer
+        .map(
+            customer -> {
+              Loan loan =
+                  Loan.builder()
+                      .customer(customer)
+                      .amount(loanData.getAmount())
+                      .createdAt(Instant.now())
+                      .build();
+              Loan createdLoan = loanService.save(loan);
+              LoanResponsePaymentPlan loanResponsePaymentPlan =
+                  LoanResponsePaymentPlan.builder()
+                      .commissionAmount(0.1d)
+                      .installments(
+                          createdLoan.getInstallments().stream()
+                              .map(
+                                  installment ->
+                                      InstallmentResponse.builder()
+                                          .amount(installment.getAmount())
+                                          .status(installment.getStatus())
+                                          .scheduledPaymentDate(
+                                              LocalDate.from(installment.getScheduledPaymentDate()))
+                                          .build())
+                              .collect(Collectors.toList()))
+                      .build();
+              return new ResponseEntity<>(
+                  LoanResponse.builder()
+                      .customerId(loanData.getCustomerId())
+                      .id(createdLoan.getId())
+                      .paymentPlan(loanResponsePaymentPlan)
+                      .status(createdLoan.getStatus())
+                      .createdAt(ZonedDateTime.from(createdLoan.getCreatedAt()))
+                      .build(),
+                  HttpStatusCode.valueOf(201));
+            })
+        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
   @GetMapping("/loans/{id}")

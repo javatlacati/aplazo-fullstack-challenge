@@ -40,24 +40,19 @@ public class LoanService {
         .findById(loan.getId())
         .map(
             existingLoan -> {
-              if (loan.getAmount() != null) {
-                existingLoan.setAmount(loan.getAmount());
-              }
-              if (loan.getInterestRate() != null) {
-                existingLoan.setInterestRate(loan.getInterestRate());
-              }
-              if (loan.getTermInMonths() != null) {
-                existingLoan.setTermInMonths(loan.getTermInMonths());
-              }
-              if (loan.getStartDate() != null) {
-                existingLoan.setStartDate(loan.getStartDate());
-              }
-              if (loan.getEndDate() != null) {
-                existingLoan.setEndDate(loan.getEndDate());
-              }
               if (loan.getCustomer() != null) {
                 existingLoan.setCustomer(loan.getCustomer());
               }
+              if (loan.getCreatedAt() != null) {
+                existingLoan.setCreatedAt(loan.getCreatedAt());
+              }
+              if (loan.getStatus() != null) {
+                existingLoan.setStatus(loan.getStatus());
+              }
+              if (loan.getInstallments() != null) {
+                existingLoan.setInstallments(loan.getInstallments());
+              }
+              existingLoan.setAmount(loan.getAmount());
 
               return existingLoan;
             })
